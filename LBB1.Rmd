@@ -1,0 +1,262 @@
+---
+title: "It Is Your Salary if You Want to Have Job in Data Science Domain"
+author: "Sabrina"
+date: '2022-07-16'
+output: 
+  html_document:
+    theme: united
+    highlight: pygments
+    toc: true
+    toc_float:
+      collapsed: false
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE,
+  fig.align = "center",
+  comment = "#>"
+)
+```
+
+# Introducing
+
+Hello everyone\
+In this RMD, I use the dataset from [kaggle datasets.](https://www.kaggle.com/datasets/ruchi798/data-science-job-salaries) The dataset contains information about salaries of jobs in the data science domain (Detail information about this data will be explained in the next section).
+
+# Input Data
+
+Previously, I have downloaded the data and then I saved it in one folder named data_input. So, let's call the data and assign to one object, I was named it as `ds`.
+
+```{r}
+ds <- read.csv("LBB 1/data_input/ds_salaries.csv")
+```
+
+Let's see the top six data from `ds`
+
+```{r}
+head(ds)
+```
+
+```{r}
+#checking dimention of data `ds`
+dim(ds)
+```
+
+The result shows that the data has 607 rows and 12 columns.
+
+**Explanation from each columns**
+
+-   **work_year** : The year the salary was paid
+
+-   **experience_level** : The experience level in the job during the year
+
+-   **employment_type** : The type of employment
+
+-   **job_title** : The role worked in during the year
+
+-   **salary** : The total gross salary amount paid
+
+-   **salary_currency** : The currency of the salary paid as an ISO 4217 currency code
+
+-   **salary_in_usd** : The salary in USD
+
+-   **employee_residence** : Employee's primary country of residence in during the work year as an ISO 3166 country code
+
+-   **remote_ratio** : The overall amount of work done remotely, possible values are as follows: 0 No remote work (less than 20%), 50 Partially remote, and 100 Fully remote (more than 80%)
+
+-   **company_location** : The country of the employer's main office or contracting branch as an ISO 3166 country code
+
+-   **company_size** : The average number of people that worked for the company during the year: S less than 50 employees (small), M 50 to 250 employees (medium) , and L more than 250 employees (large)
+
+# Clean Data
+
+### The first step in data cleaning is to check the datatype
+
+```{r}
+str(ds)
+```
+
+From the data, I found some columns that does not have datatype exactly.
+
+The datatype of these columns have to change to `factor`
+
+-   experience_level
+-   employment_type
+-   job_title
+-   salary_currency
+-   employee_residence
+-   company_location
+-   company_size
+
+```{r}
+ds$experience_level <- as.factor(ds$experience_level)
+ds$employment_type <- as.factor(ds$employment_type)
+ds$job_title <- as.factor(ds$job_title)
+ds$salary_currency <- as.factor(ds$salary_currency)
+ds$employee_residence <- as.factor(ds$employee_residence)
+ds$company_location <- as.factor(ds$company_location)
+ds$company_size <- as.factor(ds$company_size)
+```
+
+The datatype of these columns have to change to `numeric`
+
+-   work_year
+-   salary
+-   salary_in_usd
+-   remote_ratio
+
+```{r}
+ds$work_year <- as.numeric(ds$work_year)
+ds$salary <- as.numeric(ds$salary)
+ds$salary_in_usd <- as.numeric(ds$salary_in_usd)
+ds$remote_ratio <- as.numeric(ds$remote_ratio)
+```
+
+Let's check back the structure of data
+
+```{r}
+str(ds)
+```
+
+### The second step is to check the missing value
+
+```{r}
+anyNA(ds)
+```
+
+The result shows that the data does not have missing value
+
+### The third step is to drop the column that unnecessary
+
+If I pay attention the data `ds`, column `X` is unnecessary, so it is better if I remove it from the data.
+
+```{r}
+ds <- ds[ , -c(1)]
+ds
+```
+
+After did 3 steps data cleaning, the data is already clean. Let's go to the next section!
+
+# Analysis Data
+
+Let's do data analytics to answer the business questions through the informations that available in data `ds`.
+
+```{r}
+#Check summary from data ds
+summary(ds)
+```
+
+From this summary, I can know that this data start from 2020 until 2022 (work year). There are 4 experience levels, EN for Entry Level, MI for Mid-level, SE for Senior-level, and EX for Executive-level. There are also 4 employment types, CT for Contract, FL for Freelance, FT for Full Time, and PT for Part Time. This summary also shows the lowest and the highest salary that has been paid and other information from each column in data `ds`.
+
+As I know, there are some people who more interest to read information from the graphics than the table or text. So, below I will make simple plot to show information from some columns such as experience_level, employment-type, and company_size.
+
+```{r}
+# experience_level
+plot(ds$experience_level)
+```
+
+```{r}
+plot(ds$employment_type)
+```
+
+```{r}
+# job_title
+plot(ds$company_size)
+
+```
+
+### Let's Answer The Business Questions
+
+> 1.  From the data `ds`, check the average salary per job title in each work year start from 2020, 2021, and 2022, then get to know what is job title in the data science domain with highest average salary in every year?
+
+```{r}
+# 2020
+ds2020 <- ds[(ds$work_year == 2020) , ]
+hasil1 <- aggregate(formula = salary_in_usd ~ job_title, data = ds2020, FUN = mean)
+head(hasil1[order(hasil1$salary_in_usd, decreasing = T), ])
+```
+
+```{r}
+# 2021
+ds2021 <- ds[(ds$work_year == 2021) , ]
+hasil2 <- aggregate(formula = salary_in_usd ~ job_title, data = ds2021, FUN = mean)
+head(hasil2[order(hasil2$salary_in_usd, decreasing = T), ])
+```
+
+```{r}
+# 2022
+ds2022 <- ds[(ds$work_year == 2022) , ]
+hasil3 <- aggregate(formula = salary_in_usd ~ job_title, data = ds2022, FUN = mean)
+head(hasil3[order(hasil3$salary_in_usd, decreasing = T), ])
+```
+
+Answer:
+
+There are so many jobs in the data science domain, the results shown above indicate average salary (in USD) in every job in data science domain globally not differentiated by experience levels, employment type, company size and other. Based on the results, the highest average salary in 2020 is Director of Data Science, in 2021 is Financial Data Analyst, and in 2022 is Data Analytics Lead.
+
+> 2.  What country does company from that give salary more than average salary for job as a data scientist in 2021?
+
+```{r}
+salary_ds <- ds[(ds$work_year == 2021) & (ds$job_title == 'Data Scientist') , ]
+mean_salary <- mean(salary_ds$salary_in_usd)
+mean_salary
+```
+
+```{r}
+salary_ds[salary_ds$salary_in_usd > 70671.73 , "company_location"]
+```
+
+Answer :
+
+The result shows 6 countries that give more than average salary for job as data scientist in 2021
+
+-   US : United States
+-   CA : Canada
+-   IL : Israel
+-   DE : Germany
+-   GB : United Kingdom
+-   FR : France
+
+> 3.  There is a student, she wants to take a part time job in the data science domain because she has understood about data science and her experience is Middle Level. But, she feels confuse which company's country she has to choose (Part time job online). She wants to get high salary for her job. Let's help her to choose the right choice based on average salary in data `ds`.
+
+```{r}
+PT2022 <- ds[(ds$employment_type == 'PT') & (ds$experience_level == "MI") , ]
+result <- aggregate(formula = salary_in_usd ~ job_title + company_location, data = PT2022, FUN = mean)
+result[order(result$salary_in_usd, decreasing = T), ]
+```
+
+Answer :
+
+Based on data, if she wants to get high salary when she takes part time job, I suggest her to take part time job at company in Netherlands as a Data Engineer (based on data in 2020-2022).
+
+> 4.  Let's see the correlation between our experience level and salary in one company (size of company is L) that will we get
+
+```{r}
+ds$ex_level <- sapply(ds$experience_level, 
+                      FUN = switch,
+                      "EN" = 1,
+                      "MI" = 2,
+                      "SE" = 3,
+                      "EX" = 4)
+```
+
+```{r}
+company_l <- ds[(ds$company_size == "L"), c('salary_in_usd', 'ex_level')]
+head(company_l)
+```
+
+```{r}
+cor(company_l$ex_level, company_l$salary_in_usd)
+```
+
+Answer :
+
+Based on the result, I can know the correlation between experience level and salary (in USD) is weak and positive. It is mean that if your experience level is high, your salary will be high too, and if your experience level is low, your salary will be low too. But, this correlation is weak.
+
+# Conclusion
+
+From all results in data analytics, I can make a conclusion that working in the data science domain is still recommended, because so many jobs in the data science domain with different employment types and the average salary is still high in the last 3 years. Of course, United states can be the first choice if you want to choose your company based on country with high salary. The tips for you if you want to get higher salary, you can upgrade your skill in data science and add more your experience.
